@@ -22,7 +22,7 @@ Useful if you switched to a Garmin scale (e.g. Index S2) and want your historica
 ## Installation
 
 ```bash
-git clone https://github.com/romain-ccc/migrate-withings-garmin.git
+git clone https://github.com/romaincs/migrate-withings-garmin.git
 cd migrate-withings-garmin
 pip install -r requirements.txt
 ```
