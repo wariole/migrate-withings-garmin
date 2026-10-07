@@ -33,7 +33,7 @@ except ImportError:
     sys.exit(1)
 
 
-TOKEN_STORE = Path.home() / ".garth"
+TOKEN_STORE = Path.home() / ".garminconnect"
 
 
 # ---------------------------------------------------------------------------
@@ -151,8 +151,6 @@ def get_garmin_client(email: str, password: str) -> Garmin:
     client = Garmin(email=email, password=password, prompt_mfa=prompt_mfa)
 
     token_dir = str(TOKEN_STORE)
-
-    # Try to resume an existing session from the token store (no MFA needed).
     if TOKEN_STORE.exists():
         try:
             client.login(tokenstore=token_dir)
@@ -164,11 +162,8 @@ def get_garmin_client(email: str, password: str) -> Garmin:
         except Exception:
             print("Cached tokens invalid or expired – re-authenticating…")
 
-    # Fresh login (MFA prompted here if enabled on the account).
-    client.login()
-
     # Persist tokens so the next run can resume without re-authenticating.
-    client.garth.dump(token_dir)
+    client.login(tokenstore=token_dir)
     print("Authenticated and tokens saved.")
     return client
 
