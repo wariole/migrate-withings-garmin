@@ -8,7 +8,9 @@ Usage:
 Credentials can also be supplied via environment variables:
     GARMIN_EMAIL, GARMIN_PASSWORD
 
-Authentication tokens are cached in ~/.garth so subsequent runs skip re-login.
+If your account has MFA enabled, the code is prompted interactively on
+first login (or read from GARMIN_MFA_CODE if set). Subsequent runs reuse
+the tokens cached in ~/.garth and don't require re-login.
 """
 
 import argparse
@@ -137,9 +139,16 @@ def read_withings_csv(filepath: Path) -> list[dict]:
 # Garmin authentication
 # ---------------------------------------------------------------------------
 
+def prompt_mfa() -> str:
+    """Return the MFA code, from GARMIN_MFA_CODE if set, otherwise ask interactively."""
+    code = os.environ.get("GARMIN_MFA_CODE")
+    if code:
+        return code
+    return input("Garmin MFA - enter the 6-digit code you received: ")
+
 def get_garmin_client(email: str, password: str) -> Garmin:
     """Authenticate against Garmin Connect, reusing cached tokens when possible."""
-    client = Garmin(email=email, password=password)
+    client = Garmin(email=email, password=password, prompt_mfa=prompt_mfa)
 
     token_dir = str(TOKEN_STORE)
     if TOKEN_STORE.exists():
