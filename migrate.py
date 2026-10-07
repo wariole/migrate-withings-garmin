@@ -149,22 +149,7 @@ def prompt_mfa() -> str:
 def get_garmin_client(email: str, password: str) -> Garmin:
     """Authenticate against Garmin Connect, reusing cached tokens when possible."""
     client = Garmin(email=email, password=password, prompt_mfa=prompt_mfa)
-
-    token_dir = str(TOKEN_STORE)
-    if TOKEN_STORE.exists():
-        try:
-            client.login(tokenstore=token_dir)
-            print("Authenticated using cached tokens.")
-            return client
-        except GarminConnectTooManyRequestsError:
-            # Re-raise immediately – retrying would make rate-limiting worse.
-            raise
-        except Exception:
-            print("Cached tokens invalid or expired – re-authenticating…")
-
-    # Persist tokens so the next run can resume without re-authenticating.
-    client.login(tokenstore=token_dir)
-    print("Authenticated and tokens saved.")
+    client.login(tokenstore=str(TOKEN_STORE))
     return client
 
 
